@@ -40,7 +40,7 @@ const App = defineComponent({
   },
 
   computed: {
-    filteredEmails() {
+    markedEmails() {
       return this.emails.map((email) => ({
         email,
         marked: !!this.search.length && email.toLowerCase().includes(this.search.trim().toLowerCase()),

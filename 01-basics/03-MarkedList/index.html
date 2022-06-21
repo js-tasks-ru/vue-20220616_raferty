@@ -21,7 +21,7 @@
           <input type="search" v-model="search" />
         </div>
         <ul class="list">
-          <li v-for="(item, index) in filteredEmails" :key="index" :class="{marked: item.marked }">{{ item.email }}</li>
+          <li v-for="(item, index) in markedEmails" :key="index" :class="{marked: item.marked }">{{ item.email }}</li>
         </ul>
       </div>
     </div>
