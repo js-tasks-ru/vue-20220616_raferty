@@ -16,8 +16,7 @@ export default defineComponent({
 
   methods: {
     countUp() {
-      let localCount = this.count;
-      this.$emit('update:count', (localCount += 1));
+      this.$emit('update:count', this.count + 1);
     },
   },
 
