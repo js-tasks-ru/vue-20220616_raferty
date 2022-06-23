@@ -8,7 +8,6 @@ const App = defineComponent({
       firstOperand: '',
       secondOperand: '',
       operator: 'sum',
-      message: '',
     };
   },
 
@@ -27,23 +26,9 @@ const App = defineComponent({
 
       return false;
     },
-  },
 
-  watch: {
-    secondOperand(value) {
-      if ((value === 0 || !value) && this.operator === 'divide') {
-        this.message = 'На ноль делить нельзя!';
-      } else {
-        this.message = '';
-      }
-    },
-
-    operator(value) {
-      if (value === 'divide' && this.secondOperand === 0) {
-        this.message = 'На ноль делить нельзя!';
-      } else {
-        this.message = '';
-      }
+    message() {
+      return this.operator === 'divide' && this.secondOperand === 0 ? 'На ноль делить нельзя!' : '';
     },
   },
 });
