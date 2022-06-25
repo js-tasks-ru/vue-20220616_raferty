@@ -11,13 +11,6 @@ export default defineComponent({
     },
   },
 
-  data() {
-    return {
-      agendaItemIcons,
-      agendaItemDefaultTitles,
-    };
-  },
-
   computed: {
     agendaTitle() {
       return this.agendaItem.title || agendaItemDefaultTitles[this.agendaItem.type];
