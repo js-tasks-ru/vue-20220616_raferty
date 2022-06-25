@@ -7,16 +7,12 @@ export default defineComponent({
     title: {
       type: String,
       require: false,
-      default() {
-        return '';
-      },
+      default: '',
     },
     image: {
       type: String,
       require: false,
-      default() {
-        return '';
-      },
+      default: '',
     },
   },
 
