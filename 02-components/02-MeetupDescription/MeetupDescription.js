@@ -7,9 +7,7 @@ export default defineComponent({
     description: {
       type: String,
       require: false,
-      default() {
-        return '';
-      },
+      default: '',
     },
   },
 
