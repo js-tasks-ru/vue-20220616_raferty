@@ -1,6 +1,6 @@
 <template>
   <ui-toast-list>
-    <ui-toast v-for="(toast, index) in toasts" :key="index" :toast="toast" :duration="duration" dismissible />
+    <ui-toast v-for="(toast, index) in toasts" :key="index" :toast="toast" dismissible />
   </ui-toast-list>
 </template>
 
