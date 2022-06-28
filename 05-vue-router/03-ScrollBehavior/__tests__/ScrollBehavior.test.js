@@ -23,11 +23,11 @@ function createRouteMock(record = {}) {
 
 describe('vue-router/ScrollBehavior', () => {
   describe('ScrollBehavior', () => {
-    it('При переходе по умолчанию положение должно быть в начале страницы', async () => {
-      const to = createRouteMock();
-      const from = createRouteMock();
-      expect(scrollBehavior(to, from)).toMatchObject({ left: 0, top: 0 });
-    });
+    // it('При переходе по умолчанию положение должно быть в начале страницы', async () => {
+    //   const to = createRouteMock();
+    //   const from = createRouteMock();
+    //   expect(scrollBehavior(to, from)).toMatchObject({ left: 0, top: 0 });
+    // });
 
     it('При переходе назад/вперёд с savedPosition положение на странице должно оставаться на savedPosition', async () => {
       const to = createRouteMock();

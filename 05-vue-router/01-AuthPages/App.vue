@@ -1,9 +1,7 @@
 <template>
   <div class="wrapper">
     <meetups-header />
-    <main class="main">
-      <div>CURRENT PAGE</div>
-    </main>
+    <router-view />
     <meetups-footer />
   </div>
 </template>
