@@ -1,20 +1,35 @@
 <template>
-  <div class="dropdown dropdown_opened">
-    <button type="button" class="dropdown__toggle dropdown__toggle_icon">
-      <ui-icon icon="tv" class="dropdown__icon" />
-      <span>Title</span>
+  <div class="dropdown" :class="{ dropdown_opened: open }">
+    <button
+      type="button"
+      class="dropdown__toggle"
+      :class="{ dropdown__toggle_icon: hasOptionsIcon }"
+      @click="open = !open"
+    >
+      <ui-icon v-if="hasSelectedIcon" :icon="selectedOption.icon" class="dropdown__icon" />
+      <span>{{ selectedOption.text }}</span>
     </button>
 
-    <div class="dropdown__menu" role="listbox">
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 1
-      </button>
-      <button class="dropdown__item dropdown__item_icon" role="option" type="button">
-        <ui-icon icon="tv" class="dropdown__icon" />
-        Option 2
-      </button>
+    <div v-show="open" class="dropdown__menu" role="listbox">
+      <template v-for="(option, index) in options" :key="index">
+        <button
+          class="dropdown__item"
+          :class="{ dropdown__item_icon: hasOptionsIcon }"
+          role="option"
+          type="button"
+          @click="selectOption(option)"
+        >
+          <ui-icon v-if="option.icon" :icon="option.icon" class="dropdown__icon" />
+          {{ option.text }}
+        </button>
+      </template>
     </div>
+
+    <select v-model="selectedOption.value" class="dropdown__native" @change="selectNativeOption">
+      <option v-for="(option, index) in options" :key="index" :value="option.value">
+        {{ option.text }}
+      </option>
+    </select>
   </div>
 </template>
 
@@ -25,6 +40,64 @@ export default {
   name: 'UiDropdown',
 
   components: { UiIcon },
+
+  props: {
+    options: {
+      type: Array,
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+    },
+    modelValue: {
+      type: String,
+    },
+  },
+
+  emits: ['update:modelValue'],
+
+  data() {
+    return {
+      open: false,
+    };
+  },
+
+  computed: {
+    selectedOption() {
+      if (this.modelValue) {
+        return {
+          value: this.modelValue,
+          text: this.options.find((option) => option.value === this.modelValue).text,
+          icon: this.options.find((option) => option.value === this.modelValue).icon,
+        };
+      } else {
+        return {
+          text: this.title,
+        };
+      }
+    },
+
+    hasOptionsIcon() {
+      return this.options.some((item) => item.icon);
+    },
+
+    hasSelectedIcon() {
+      return !!this.selectedOption?.icon;
+    },
+  },
+
+  methods: {
+    selectOption(option) {
+      this.$emit('update:modelValue', option.value);
+      this.open = !this.open;
+    },
+
+    selectNativeOption(event) {
+      this.$emit('update:modelValue', event.target.value);
+      this.open = !this.open;
+    },
+  },
 };
 </script>
 
@@ -58,7 +131,7 @@ export default {
 .dropdown__toggle:after {
   content: '';
   position: absolute;
-  top: 15px;
+  top: 12px;
   right: 16px;
   transform: none;
   background: url('@/assets/icons/icon-chevron-down.svg') no-repeat;
@@ -137,5 +210,9 @@ export default {
   top: 50%;
   left: 16px;
   transform: translate(0, -50%);
+}
+
+.dropdown__native {
+  display: none;
 }
 </style>
