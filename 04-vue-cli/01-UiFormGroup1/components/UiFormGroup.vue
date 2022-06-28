@@ -5,8 +5,10 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'UiFormGroup',
 
   props: {
@@ -22,14 +24,14 @@ export default {
   },
 
   computed: {
-    classes() {
+    classes(): object {
       return {
         'form-group': true,
         'form-group_inline': this.inline,
       };
     },
   },
-};
+});
 </script>
 
 <style scoped>

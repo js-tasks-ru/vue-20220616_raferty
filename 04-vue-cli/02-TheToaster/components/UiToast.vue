@@ -2,15 +2,25 @@
   <div :class="classes">
     <ui-icon class="toast__icon" :icon="toastIcon" />
     <span class="toast__message">{{ toast.message }}</span>
-    <ui-icon v-if="dismissible" class="toast__icon" icon="trash" />
+    <ui-icon v-if="dismissible" class="toast__icon" icon="trash" @click="removeToast" />
   </div>
 </template>
 
-<script>
-import { toastTypes } from '../toastService';
+<script lang="ts">
 import UiIcon from './UiIcon.vue';
+import { defineComponent } from 'vue';
 
-export default {
+interface ToastTypes {
+  success: string;
+  error: string;
+}
+
+const toastTypes: ToastTypes = {
+  success: 'check-circle',
+  error: 'alert-circle',
+};
+
+export default defineComponent({
   name: 'UiToast',
 
   components: { UiIcon },
@@ -28,25 +38,27 @@ export default {
     },
   },
 
-  data() {
-    return {
-      intervalId: null,
-    };
-  },
+  emits: ['onRemove'],
 
   computed: {
-    classes() {
+    classes(): object {
       return {
         toast: true,
         [`toast_${this.toast.type}`]: true,
       };
     },
 
-    toastIcon() {
-      return toastTypes[this.toast.type];
+    toastIcon(): string {
+      return toastTypes[this.toast.type as keyof ToastTypes];
     },
   },
-};
+
+  methods: {
+    removeToast(): void {
+      this.$emit('onRemove', this.toast.id);
+    },
+  },
+});
 </script>
 
 <style>

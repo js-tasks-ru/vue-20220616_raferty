@@ -4,8 +4,10 @@
   </div>
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'MeetupCover',
 
   props: {
@@ -20,11 +22,11 @@ export default {
   },
 
   computed: {
-    bindedBackground() {
-      return this.image ? 'url(' + this.image + ')' : `var(--default-cover)`;
+    bindedBackground(): string {
+      return this.image ? 'url(' + this.image + ')' : 'var(--default-cover)';
     },
   },
-};
+});
 </script>
 
 <style scoped>
