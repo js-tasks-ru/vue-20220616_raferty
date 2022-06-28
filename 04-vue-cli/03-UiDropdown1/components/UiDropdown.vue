@@ -60,38 +60,30 @@ export default {
   data() {
     return {
       open: false,
-      selectedOption: {
-        text: this.title,
-      },
     };
   },
 
   computed: {
+    selectedOption() {
+      if (this.modelValue) {
+        return {
+          value: this.modelValue,
+          text: this.options.find((option) => option.value === this.modelValue).text,
+          icon: this.options.find((option) => option.value === this.modelValue).icon,
+        };
+      } else {
+        return {
+          text: this.title,
+        };
+      }
+    },
+
     hasOptionsIcon() {
-      return !!this.options.filter((item) => item.icon).length;
+      return this.options.some((item) => item.icon);
     },
 
     hasSelectedIcon() {
-      return this.selectedOption && !!this.selectedOption.icon;
-    },
-  },
-
-  watch: {
-    modelValue: {
-      immediate: true,
-      handler(newValue) {
-        if (newValue) {
-          this.selectedOption = {
-            value: newValue,
-            text: this.options.find((option) => option.value === newValue).text,
-            icon: this.options.find((option) => option.value === newValue).icon,
-          };
-        } else {
-          this.selectedOption = {
-            text: this.title,
-          };
-        }
-      },
+      return !!this.selectedOption?.icon;
     },
   },
 

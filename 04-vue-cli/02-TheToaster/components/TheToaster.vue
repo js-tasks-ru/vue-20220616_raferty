@@ -26,44 +26,36 @@ export default defineComponent({
     return {
       toasts: [] as Toasts[],
       duration: 5000,
-      intervalId: 0,
     };
-  },
-
-  watch: {
-    toasts: {
-      deep: true,
-      handler(newValue) {
-        if (newValue.length > 0) {
-          this.intervalId = setInterval(() => {
-            this.removeToast();
-          }, this.duration);
-        } else {
-          clearInterval(this.intervalId);
-        }
-      },
-    },
   },
 
   methods: {
     success(message: string): void {
+      const toastId = Math.random().toString(16).slice(2);
+
       this.toasts.push({
-        id: Math.random().toString(16).slice(2),
+        id: toastId,
         message,
         type: 'success',
       });
+
+      setTimeout(() => {
+        this.removeToastById(toastId);
+      }, this.duration);
     },
 
     error(message: string): void {
+      const toastId = Math.random().toString(16).slice(2);
+
       this.toasts.push({
-        id: Math.random().toString(16).slice(2),
+        id: toastId,
         message,
         type: 'error',
       });
-    },
 
-    removeToast(): void {
-      this.toasts.shift();
+      setTimeout(() => {
+        this.removeToastById(toastId);
+      }, this.duration);
     },
 
     removeToastById(id: string): void {

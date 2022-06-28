@@ -28,9 +28,7 @@ export default defineComponent({
   props: {
     toast: {
       type: Object,
-      default() {
-        return {};
-      },
+      required: true,
     },
     dismissible: {
       type: Boolean,
