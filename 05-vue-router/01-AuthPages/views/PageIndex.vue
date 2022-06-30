@@ -1,7 +1,9 @@
 <template>
   <ui-container>
     <h2 class="title">IndexPage</h2>
-    Для проверки: <router-link to="/login?from=/">/login?from=/</router-link>
+    Для проверки:
+    <div><router-link to="/login?from=/">/login?from=/</router-link></div>
+    <div><router-link to="/login?from=/register">/login?from=/register</router-link></div>
   </ui-container>
 </template>
 
