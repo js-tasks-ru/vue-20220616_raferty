@@ -48,18 +48,6 @@ export default {
     };
   },
 
-  watch: {
-    preview: {
-      immediate: true,
-      handler(newValue) {
-        if(newValue) {
-          this.localImage = newValue;
-          this.currentCondition = 'filled';
-        }
-      }
-    },
-  },
-
   computed: {
     currentConditionText() {
       return this.$options.conditions[this.currentCondition];
@@ -67,6 +55,18 @@ export default {
 
     eventName() {
       return this.localImage ? 'click' : 'change';
+    },
+  },
+
+  watch: {
+    preview: {
+      immediate: true,
+      handler(newValue) {
+        if (newValue) {
+          this.localImage = newValue;
+          this.currentCondition = 'filled';
+        }
+      },
     },
   },
 

@@ -6,10 +6,6 @@
       @remove="image = undefined"
       @upload="image = $event.image"
     />
-    <ui-image-uploader
-      @remove="image = undefined"
-      @upload="image = $event.image"
-    />
   </div>
 </template>
 
