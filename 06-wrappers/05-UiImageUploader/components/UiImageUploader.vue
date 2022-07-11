@@ -8,7 +8,7 @@
       <span class="image-uploader__text">{{ currentConditionText }}</span>
       <input
         v-bind="$attrs"
-        ref="file"
+        ref="fileInput"
         type="file"
         accept="image/*"
         class="image-uploader__input"
@@ -71,37 +71,36 @@ export default {
   },
 
   methods: {
-    onFileChange() {
-      this.$emit('select', this.$refs.file.files[0]);
-      this.currentCondition = 'loading';
+    reset() {
+      this.currentCondition = 'empty';
+      this.$refs.fileInput.value = '';
+      this.localImage = null;
+    },
 
+    onFileChange() {
       if (this.localImage) {
         this.$emit('remove');
-        this.currentCondition = 'empty';
-        this.$refs.file.value = '';
-        this.localImage = null;
+        this.reset();
         return false;
       }
 
+      this.$emit('select', this.$refs.fileInput.files[0]);
+      this.currentCondition = 'loading';
+
       if (this.uploader) {
-        this.uploader(this.$refs.file.files[0])
+        this.uploader(this.$refs.fileInput.files[0])
           .then((response) => {
             this.currentCondition = 'filled';
             this.$emit('upload', response);
           })
           .catch((error) => {
-            this.currentCondition = 'empty';
-            this.localImage = null;
-            this.$refs.file.value = '';
             this.$emit('error', error);
+            this.reset();
           });
       } else {
-        const file = URL.createObjectURL(this.$refs.file.files[0]);
+        const file = URL.createObjectURL(this.$refs.fileInput.files[0]);
 
-        this.$emit('upload', {
-          image: file,
-        });
-
+        this.localImage = file;
         this.currentCondition = 'filled';
       }
     },
