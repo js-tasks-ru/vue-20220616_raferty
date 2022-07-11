@@ -1,13 +1,37 @@
 <template>
-  <div class="input-group input-group_icon input-group_icon-left input-group_icon-right">
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+  <div
+    class="input-group"
+    :class="{
+      'input-group_icon': Boolean($slots['left-icon']) || Boolean($slots['right-icon']),
+      'input-group_icon-left': Boolean($slots['left-icon']),
+      'input-group_icon-right': Boolean($slots['right-icon']),
+    }"
+  >
+    <div v-if="$slots['left-icon']" class="input-group__icon">
+      <slot name="left-icon" />
     </div>
 
-    <input ref="input" class="form-control form-control_rounded form-control_sm" />
+    <textarea
+      v-if="multiline"
+      ref="input"
+      v-bind="$attrs"
+      :value="modelValue"
+      class="form-control"
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }"
+      @[eventName]="eventHandler"
+    />
+    <input
+      v-else
+      ref="input"
+      v-bind="$attrs"
+      :value="modelValue"
+      class="form-control"
+      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }"
+      @[eventName]="eventHandler"
+    />
 
-    <div class="input-group__icon">
-      <img class="icon" alt="icon" />
+    <div v-if="$slots['right-icon']" class="input-group__icon">
+      <slot name="right-icon" />
     </div>
   </div>
 </template>
@@ -15,6 +39,51 @@
 <script>
 export default {
   name: 'UiInput',
+
+  inheritAttrs: false,
+
+  props: {
+    small: {
+      type: Boolean,
+      default: false,
+    },
+
+    rounded: {
+      type: Boolean,
+      default: false,
+    },
+
+    multiline: {
+      type: Boolean,
+      default: false,
+    },
+
+    modelValue: {
+      type: String,
+    },
+
+    modelModifiers: {
+      default: () => ({}),
+    },
+  },
+
+  emits: ['update:modelValue'],
+
+  computed: {
+    eventName() {
+      return this.modelModifiers.lazy ? 'change' : 'input';
+    },
+  },
+
+  methods: {
+    focus() {
+      this.$refs.input.focus();
+    },
+
+    eventHandler(e) {
+      this.$emit('update:modelValue', e.target.value);
+    },
+  },
 };
 </script>
 

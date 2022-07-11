@@ -1,8 +1,19 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': currentCondition === 'loading' }"
+      :style="[currentCondition === 'filled' ? `--bg-url:url(${localImage})` : '']"
+    >
+      <span class="image-uploader__text">{{ currentConditionText }}</span>
+      <input
+        v-bind="$attrs"
+        ref="fileInput"
+        type="file"
+        accept="image/*"
+        class="image-uploader__input"
+        @[eventName].prevent="onFileChange"
+      />
     </label>
   </div>
 </template>
@@ -10,6 +21,90 @@
 <script>
 export default {
   name: 'UiImageUploader',
+
+  inheritAttrs: false,
+
+  props: {
+    preview: {
+      type: String,
+    },
+    uploader: {
+      type: Function,
+    },
+  },
+
+  emits: ['select', 'upload', 'remove', 'error'],
+
+  conditions: {
+    empty: 'Загрузить изображение',
+    loading: 'Загрузка...',
+    filled: 'Удалить изображение',
+  },
+
+  data() {
+    return {
+      currentCondition: 'empty',
+      localImage: null,
+    };
+  },
+
+  computed: {
+    currentConditionText() {
+      return this.$options.conditions[this.currentCondition];
+    },
+
+    eventName() {
+      return this.localImage ? 'click' : 'change';
+    },
+  },
+
+  watch: {
+    preview: {
+      immediate: true,
+      handler(newValue) {
+        if (newValue) {
+          this.localImage = newValue;
+          this.currentCondition = 'filled';
+        }
+      },
+    },
+  },
+
+  methods: {
+    reset() {
+      this.currentCondition = 'empty';
+      this.$refs.fileInput.value = '';
+      this.localImage = null;
+    },
+
+    onFileChange() {
+      if (this.localImage) {
+        this.$emit('remove');
+        this.reset();
+        return false;
+      }
+
+      this.$emit('select', this.$refs.fileInput.files[0]);
+      this.currentCondition = 'loading';
+
+      if (this.uploader) {
+        this.uploader(this.$refs.fileInput.files[0])
+          .then((response) => {
+            this.currentCondition = 'filled';
+            this.$emit('upload', response);
+          })
+          .catch((error) => {
+            this.$emit('error', error);
+            this.reset();
+          });
+      } else {
+        const file = URL.createObjectURL(this.$refs.fileInput.files[0]);
+
+        this.localImage = file;
+        this.currentCondition = 'filled';
+      }
+    },
+  },
 };
 </script>
 
