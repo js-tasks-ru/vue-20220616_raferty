@@ -3,7 +3,7 @@
     <label
       class="image-uploader__preview"
       :class="{ 'image-uploader__preview-loading': currentCondition === 'loading' }"
-      :style="[currentCondition === 'filled' ? `--bg-url:url(${preview})` : '']"
+      :style="[currentCondition === 'filled' ? `--bg-url:url(${localImage})` : '']"
     >
       <span class="image-uploader__text">{{ currentConditionText }}</span>
       <input
@@ -44,7 +44,20 @@ export default {
   data() {
     return {
       currentCondition: 'empty',
+      localImage: null,
     };
+  },
+
+  watch: {
+    preview: {
+      immediate: true,
+      handler(newValue) {
+        if(newValue) {
+          this.localImage = newValue;
+          this.currentCondition = 'filled';
+        }
+      }
+    },
   },
 
   computed: {
@@ -53,12 +66,8 @@ export default {
     },
 
     eventName() {
-      return this.preview ? 'click' : 'change';
+      return this.localImage ? 'click' : 'change';
     },
-  },
-
-  created() {
-    if (this.preview) this.currentCondition = 'filled';
   },
 
   methods: {
@@ -66,11 +75,11 @@ export default {
       this.$emit('select', this.$refs.file.files[0]);
       this.currentCondition = 'loading';
 
-      if (this.preview) {
+      if (this.localImage) {
         this.$emit('remove');
         this.currentCondition = 'empty';
         this.$refs.file.value = '';
-
+        this.localImage = null;
         return false;
       }
 
@@ -82,6 +91,7 @@ export default {
           })
           .catch((error) => {
             this.currentCondition = 'empty';
+            this.localImage = null;
             this.$refs.file.value = '';
             this.$emit('error', error);
           });
