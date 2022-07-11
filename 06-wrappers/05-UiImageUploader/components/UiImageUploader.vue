@@ -1,8 +1,19 @@
 <template>
   <div class="image-uploader">
-    <label class="image-uploader__preview image-uploader__preview-loading" style="--bg-url: url('/link.jpeg')">
-      <span class="image-uploader__text">Загрузить изображение</span>
-      <input type="file" accept="image/*" class="image-uploader__input" />
+    <label
+      class="image-uploader__preview"
+      :class="{ 'image-uploader__preview-loading': currentCondition === 'loading' }"
+      :style="[currentCondition === 'filled' ? `--bg-url:url(${preview})` : '']"
+    >
+      <span class="image-uploader__text">{{ currentConditionText }}</span>
+      <input
+        v-bind="$attrs"
+        ref="file"
+        type="file"
+        accept="image/*"
+        class="image-uploader__input"
+        @[eventName].prevent="onFileChange"
+      />
     </label>
   </div>
 </template>
@@ -10,6 +21,81 @@
 <script>
 export default {
   name: 'UiImageUploader',
+
+  inheritAttrs: false,
+
+  props: {
+    preview: {
+      type: String,
+    },
+    uploader: {
+      type: Function,
+    },
+  },
+
+  emits: ['select', 'upload', 'remove', 'error'],
+
+  conditions: {
+    empty: 'Загрузить изображение',
+    loading: 'Загрузка...',
+    filled: 'Удалить изображение',
+  },
+
+  data() {
+    return {
+      currentCondition: 'empty',
+    };
+  },
+
+  computed: {
+    currentConditionText() {
+      return this.$options.conditions[this.currentCondition];
+    },
+
+    eventName() {
+      return this.preview ? 'click' : 'change';
+    },
+  },
+
+  created() {
+    if (this.preview) this.currentCondition = 'filled';
+  },
+
+  methods: {
+    onFileChange() {
+      this.$emit('select', this.$refs.file.files[0]);
+      this.currentCondition = 'loading';
+
+      if (this.preview) {
+        this.$emit('remove');
+        this.currentCondition = 'empty';
+        this.$refs.file.value = '';
+
+        return false;
+      }
+
+      if (this.uploader) {
+        this.uploader(this.$refs.file.files[0])
+          .then((response) => {
+            this.currentCondition = 'filled';
+            this.$emit('upload', response);
+          })
+          .catch((error) => {
+            this.currentCondition = 'empty';
+            this.$refs.file.value = '';
+            this.$emit('error', error);
+          });
+      } else {
+        const file = URL.createObjectURL(this.$refs.file.files[0]);
+
+        this.$emit('upload', {
+          image: file,
+        });
+
+        this.currentCondition = 'filled';
+      }
+    },
+  },
 };
 </script>
 

@@ -7,7 +7,7 @@
       'input-group_icon-right': Boolean($slots['right-icon']),
     }"
   >
-    <div class="input-group__icon" v-if="$slots['left-icon']">
+    <div v-if="$slots['left-icon']" class="input-group__icon">
       <slot name="left-icon" />
     </div>
 
@@ -16,21 +16,21 @@
       ref="input"
       v-bind="$attrs"
       :value="modelValue"
-      @[eventName] = "eventHandler"
       class="form-control"
       :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }"
+      @[eventName]="eventHandler"
     />
     <input
       v-else
       ref="input"
       v-bind="$attrs"
       :value="modelValue"
-      @[eventName] = "eventHandler"
       class="form-control"
       :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }"
+      @[eventName]="eventHandler"
     />
 
-    <div class="input-group__icon" v-if="$slots['right-icon']">
+    <div v-if="$slots['right-icon']" class="input-group__icon">
       <slot name="right-icon" />
     </div>
   </div>
@@ -63,9 +63,11 @@ export default {
     },
 
     modelModifiers: {
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
+
+  emits: ['update:modelValue'],
 
   computed: {
     eventName() {
@@ -79,9 +81,9 @@ export default {
     },
 
     eventHandler(e) {
-      this.$emit('update:modelValue', e.target.value)
-    }
-  }
+      this.$emit('update:modelValue', e.target.value);
+    },
+  },
 };
 </script>
 
