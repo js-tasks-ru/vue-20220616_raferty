@@ -14,21 +14,23 @@ export default {
 
   props: {
     modelValue: {
-      type: [Array, Boolean, Set]
-    }
+      type: [Array, Boolean, Set],
+    },
   },
+
+  emits: ['update:modelValue'],
 
   computed: {
     modelValueProxy: {
       get() {
-        return this.modelValue
+        return this.modelValue;
       },
 
       set(value) {
-        this.$emit("update:modelValue", value)
-      }
-    }
-  }
+        this.$emit('update:modelValue', value);
+      },
+    },
+  },
 };
 </script>
 
