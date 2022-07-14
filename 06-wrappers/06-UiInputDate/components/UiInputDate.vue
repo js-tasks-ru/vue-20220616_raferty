@@ -12,19 +12,19 @@ import UiInput from './UiInput';
 export default {
   name: 'UiInputDate',
 
-  inheritAttrs: false,
-
   components: { UiInput },
+
+  inheritAttrs: false,
 
   props: {
     type: {
       type: String,
-      default: 'date'
+      default: 'date',
     },
     modelValue: {
       type: Number,
       default: null,
-    }
+    },
   },
 
   emits: ['update:modelValue'],
@@ -43,31 +43,32 @@ export default {
     formatDate(date) {
       const formattedDate = new Date(date);
 
-      switch(this.type) {
+      switch (this.type) {
         case 'date':
-          if(date === null) {
+          if (date === null) {
             return;
           }
           return formattedDate.toISOString().split('T')[0];
-        case 'time':
+        case 'time': {
           let hours = formattedDate.getUTCHours();
 
-          if(hours < 10) {
+          if (hours < 10) {
             hours = `0${hours}`;
           }
 
           let minutes = formattedDate.getUTCMinutes();
 
-          if(minutes < 10) {
+          if (minutes < 10) {
             minutes = `0${minutes}`;
           }
 
           return hours + ':' + minutes;
+        }
+
         case 'datetime-local':
           return formattedDate.toISOString().slice(0, formattedDate.toISOString().length - 8);
       }
     },
-
-  }
+  },
 };
 </script>

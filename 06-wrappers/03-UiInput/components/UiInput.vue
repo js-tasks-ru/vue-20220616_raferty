@@ -12,7 +12,7 @@
     </div>
 
     <component
-      :is='inputComponent'
+      :is="inputComponent"
       ref="input"
       v-bind="$attrs"
       :value="modelValue"
@@ -66,8 +66,8 @@ export default {
     },
 
     inputComponent() {
-      return this.multiline ? 'textarea': 'input'
-    }
+      return this.multiline ? 'textarea' : 'input';
+    },
   },
 
   methods: {
