@@ -11,17 +11,8 @@
       <slot name="left-icon" />
     </div>
 
-    <textarea
-      v-if="multiline"
-      ref="input"
-      v-bind="$attrs"
-      :value="modelValue"
-      class="form-control"
-      :class="{ 'form-control_rounded': rounded, 'form-control_sm': small }"
-      @[eventName]="eventHandler"
-    />
-    <input
-      v-else
+    <component
+      :is="inputComponent"
       ref="input"
       v-bind="$attrs"
       :value="modelValue"
@@ -72,6 +63,10 @@ export default {
   computed: {
     eventName() {
       return this.modelModifiers.lazy ? 'change' : 'input';
+    },
+
+    inputComponent() {
+      return this.multiline ? 'textarea' : 'input';
     },
   },
 
