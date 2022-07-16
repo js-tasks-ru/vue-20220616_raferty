@@ -1,6 +1,7 @@
 <template>
   <div v-if="!sensors">Loading...</div>
   <template v-else>
+    {{ $data }}
     <sensors-data-row v-for="sensor in sensors" :key="sensor.id" :sensor="sensor" />
   </template>
 </template>
@@ -17,6 +18,7 @@ export default {
 
   data() {
     return {
+      rowIndex: 0,
       sensors: null,
     };
   },
@@ -24,6 +26,8 @@ export default {
   mounted() {
     this.sensorsDataController = new SensorsDataController(new SensorsDataStreamingService());
     this.sensorsDataController.addDataCallback(this.callback);
+
+    console.log('this.sensorsDataController', this.sensorsDataController);
 
     // Раз в секунду запрашиваем и выводим новые данные сенсоров
     setInterval(() => {
@@ -36,13 +40,19 @@ export default {
     this.sensorsDataController.close();
   },
 
+  computed: {
+    forceRerender() {
+      return rowIndex += 1;
+    }
+  },
+
   methods: {
     callback(data) {
       this.setData(data);
     },
 
     setData(sensors) {
-      this.sensors = sensors;
+      this.sensors = { ...sensors };
     },
   },
 };
