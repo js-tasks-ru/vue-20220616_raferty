@@ -11,26 +11,32 @@
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <ui-form-group label="Начало">
-          <ui-input type="time" placeholder="00:00" name="startsAt" v-model="localAgendaItem.startsAt" />
+          <ui-input v-model="localAgendaItem.startsAt" type="time" placeholder="00:00" name="startsAt" />
         </ui-form-group>
       </div>
       <div class="agenda-item-form__col">
         <ui-form-group label="Окончание">
-          <ui-input type="time" placeholder="00:00" name="endsAt" v-model="localAgendaItem.endsAt" />
+          <ui-input
+            v-model="localAgendaItem.endsAt"
+            type="time"
+            placeholder="00:00"
+            name="endsAt"
+            @change="changeEndsTime"
+          />
         </ui-form-group>
       </div>
     </div>
 
-    <ui-form-group label="Заголовок" v-if="!localAgendaItem.type">
-      <ui-input name="title" v-model="localAgendaItem.title"/>
+    <ui-form-group v-if="!localAgendaItem.type" label="Заголовок">
+      <ui-input v-model="localAgendaItem.title" name="title" />
     </ui-form-group>
 
-    <ui-form-group label="Описание" v-if="!localAgendaItem.type">
-      <ui-input multiline name="description" v-model="localAgendaItem.description" />
+    <ui-form-group v-if="!localAgendaItem.type" label="Описание">
+      <ui-input v-model="localAgendaItem.description" multiline name="description" />
     </ui-form-group>
 
-    <ui-form-group v-for="(field, index) in agendaFields" :label="field.label" :key="index">
-      <component :is='field.component' v-bind="field.props" v-model="localAgendaItem[field.props.name]"></component>
+    <ui-form-group v-for="(field, index) in agendaFields" :key="index" :label="field.label">
+      <component :is="field.component" v-bind="field.props" v-model="localAgendaItem[field.props.name]"></component>
     </ui-form-group>
   </fieldset>
 </template>
@@ -176,11 +182,14 @@ export default {
     },
   },
 
+  emits: ['update:agendaItem', 'remove'],
+
   data() {
     return {
       localAgendaItem: klona(this.agendaItem),
       agendaFields: undefined,
-    }
+      duration: 5,
+    };
   },
 
   watch: {
@@ -188,41 +197,68 @@ export default {
       deep: true,
       immediate: true,
       handler(value) {
-        if(!dequal(value, this.agendaItem)) {
+        if (!dequal(value, this.agendaItem)) {
           this.$emit('update:agendaItem', klona(value));
         }
-      }
+      },
     },
 
-    "localAgendaItem.type": {
+    'localAgendaItem.type': {
       immediate: true,
       handler(value) {
         this.agendaFields = agendaItemFormSchemas[value];
-      }
+      },
     },
 
-    "localAgendaItem.startsAt": {
+    'localAgendaItem.startsAt': {
       handler(value) {
-        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value);
-      }
-    }
+        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value, 'plus');
+      },
+    },
   },
 
   methods: {
-    getMomentFromTimeString(str) {
-      const time = moment.utc(str, 'hh:mm');
-      const hours = time.get('hour') + 5;
+    changeEndsTime(event) {
+      this.localAgendaItem.startsAt = this.decreaseTime(event.target.value);
+    },
 
-      if(hours > 24) {
+    decreaseTime(time) {
+      const momentTime = moment.utc(time, 'hh:mm');
+      const momentEndsHours = momentTime.get('hour');
+
+      if (momentEndsHours > 24) {
+        momentTime.add(-1, 'd');
+        time.set('hour', momentEndsHours - 24);
+      } else {
+        momentTime.add(-5, 'h');
+      }
+
+      return momentTime.format('HH:mm');
+    },
+
+    getMomentFromTimeString(str, endsAt) {
+      const endsTime = moment.utc(endsAt, 'hh:mm');
+      const endsHours = endsTime.get('hour');
+
+      const time = moment.utc(str, 'hh:mm');
+      let hours = time.get('hour');
+
+      if (hours < endsHours) {
+        hours = endsTime - 5;
+      } else {
+        hours = hours + 5;
+      }
+
+      if (hours > 24) {
         time.add(1, 'd');
         time.set('hour', hours - 24);
       } else {
         time.add(5, 'h');
       }
 
-      return time.format('hh:mm');
-    }
-  }
+      return time.format('HH:mm');
+    },
+  },
 };
 </script>
 

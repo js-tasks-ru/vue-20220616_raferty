@@ -16,10 +16,6 @@ export default {
   props: {
     sensor: Object,
   },
-
-  mounted() {
-    console.log('sensor', this.sensor);
-  }
 };
 </script>
 

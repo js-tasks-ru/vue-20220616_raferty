@@ -11,6 +11,8 @@ import { SensorsDataController } from '../services/SensorsDataController';
 import { SensorsDataStreamingService } from '../services/SensorsDataStreamingService';
 import SensorsDataRow from './SensorsDataRow';
 
+import { klona } from 'klona';
+
 export default {
   name: 'SensorsDataView',
 
@@ -23,11 +25,15 @@ export default {
     };
   },
 
+  computed: {
+    forceRerender() {
+      return (rowIndex += 1);
+    },
+  },
+
   mounted() {
     this.sensorsDataController = new SensorsDataController(new SensorsDataStreamingService());
     this.sensorsDataController.addDataCallback(this.callback);
-
-    console.log('this.sensorsDataController', this.sensorsDataController);
 
     // Раз в секунду запрашиваем и выводим новые данные сенсоров
     setInterval(() => {
@@ -40,19 +46,13 @@ export default {
     this.sensorsDataController.close();
   },
 
-  computed: {
-    forceRerender() {
-      return rowIndex += 1;
-    }
-  },
-
   methods: {
     callback(data) {
       this.setData(data);
     },
 
     setData(sensors) {
-      this.sensors = { ...sensors };
+      this.sensors = klona(sensors);
     },
   },
 };
