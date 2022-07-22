@@ -198,7 +198,7 @@ export default {
       immediate: true,
       handler(value) {
         if (!dequal(value, this.agendaItem)) {
-          this.$emit('update:agendaItem', klona(value));
+          this.$emit('update:agendaItem', value);
         }
       },
     },
@@ -212,7 +212,7 @@ export default {
 
     'localAgendaItem.startsAt': {
       handler(value) {
-        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value, 'plus');
+        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value);
       },
     },
   },
@@ -232,22 +232,12 @@ export default {
       } else {
         momentTime.add(-5, 'h');
       }
-
       return momentTime.format('HH:mm');
     },
 
-    getMomentFromTimeString(str, endsAt) {
-      const endsTime = moment.utc(endsAt, 'hh:mm');
-      const endsHours = endsTime.get('hour');
-
+    getMomentFromTimeString(str) {
       const time = moment.utc(str, 'hh:mm');
-      let hours = time.get('hour');
-
-      if (hours < endsHours) {
-        hours = endsTime - 5;
-      } else {
-        hours = hours + 5;
-      }
+      const hours = time.get('hour');
 
       if (hours > 24) {
         time.add(1, 'd');

@@ -20,15 +20,8 @@ export default {
 
   data() {
     return {
-      rowIndex: 0,
       sensors: null,
     };
-  },
-
-  computed: {
-    forceRerender() {
-      return (rowIndex += 1);
-    },
   },
 
   mounted() {
