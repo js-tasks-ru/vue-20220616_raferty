@@ -1,31 +1,42 @@
 <template>
   <fieldset class="agenda-item-form">
-    <button type="button" class="agenda-item-form__remove-button">
+    <button type="button" class="agenda-item-form__remove-button" @click="$emit('remove')">
       <ui-icon icon="trash" />
     </button>
 
     <ui-form-group>
-      <ui-dropdown title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
+      <ui-dropdown v-model="localAgendaItem.type" title="Тип" :options="$options.agendaItemTypeOptions" name="type" />
     </ui-form-group>
 
     <div class="agenda-item-form__row">
       <div class="agenda-item-form__col">
         <ui-form-group label="Начало">
-          <ui-input type="time" placeholder="00:00" name="startsAt" />
+          <ui-input v-model="localAgendaItem.startsAt" type="time" placeholder="00:00" name="startsAt" />
         </ui-form-group>
       </div>
       <div class="agenda-item-form__col">
         <ui-form-group label="Окончание">
-          <ui-input type="time" placeholder="00:00" name="endsAt" />
+          <ui-input
+            v-model="localAgendaItem.endsAt"
+            type="time"
+            placeholder="00:00"
+            name="endsAt"
+            @change="changeEndsTime"
+          />
         </ui-form-group>
       </div>
     </div>
 
-    <ui-form-group label="Заголовок">
-      <ui-input name="title" />
+    <ui-form-group v-if="!localAgendaItem.type" label="Заголовок">
+      <ui-input v-model="localAgendaItem.title" name="title" />
     </ui-form-group>
-    <ui-form-group label="Описание">
-      <ui-input multiline name="description" />
+
+    <ui-form-group v-if="!localAgendaItem.type" label="Описание">
+      <ui-input v-model="localAgendaItem.description" multiline name="description" />
+    </ui-form-group>
+
+    <ui-form-group v-for="(field, index) in agendaFields" :key="index" :label="field.label">
+      <component :is="field.component" v-bind="field.props" v-model="localAgendaItem[field.props.name]"></component>
     </ui-form-group>
   </fieldset>
 </template>
@@ -35,6 +46,11 @@ import UiIcon from './UiIcon';
 import UiFormGroup from './UiFormGroup';
 import UiInput from './UiInput';
 import UiDropdown from './UiDropdown';
+
+import { klona } from 'klona';
+import { dequal } from 'dequal';
+
+import moment from 'moment';
 
 const agendaItemTypeIcons = {
   registration: 'key',
@@ -163,6 +179,84 @@ export default {
     agendaItem: {
       type: Object,
       required: true,
+    },
+  },
+
+  emits: ['update:agendaItem', 'remove'],
+
+  data() {
+    return {
+      localAgendaItem: klona(this.agendaItem),
+      agendaFields: undefined,
+      duration: 5,
+    };
+  },
+
+  watch: {
+    localAgendaItem: {
+      deep: true,
+      immediate: true,
+      handler(value) {
+        if (!dequal(value, this.agendaItem)) {
+          this.$emit('update:agendaItem', klona(value));
+        }
+      },
+    },
+
+    'localAgendaItem.type': {
+      immediate: true,
+      handler(value) {
+        this.agendaFields = agendaItemFormSchemas[value];
+      },
+    },
+
+    'localAgendaItem.startsAt': {
+      handler(value) {
+        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value, 'plus');
+      },
+    },
+  },
+
+  methods: {
+    changeEndsTime(event) {
+      this.localAgendaItem.startsAt = this.decreaseTime(event.target.value);
+    },
+
+    decreaseTime(time) {
+      const momentTime = moment.utc(time, 'hh:mm');
+      const momentEndsHours = momentTime.get('hour');
+
+      if (momentEndsHours > 24) {
+        momentTime.add(-1, 'd');
+        time.set('hour', momentEndsHours - 24);
+      } else {
+        momentTime.add(-5, 'h');
+      }
+
+      return momentTime.format('HH:mm');
+    },
+
+    getMomentFromTimeString(str, endsAt) {
+      const endsTime = moment.utc(endsAt, 'hh:mm');
+      const endsHours = endsTime.get('hour');
+
+      const time = moment.utc(str, 'hh:mm');
+      let hours = time.get('hour');
+
+      if (hours < endsHours) {
+        hours = endsTime - 5;
+      } else {
+        hours = hours + 5;
+      }
+
+      if (hours > 24) {
+        time.add(1, 'd');
+        time.set('hour', hours - 24);
+      } else {
+        time.add(5, 'h');
+      }
+
+      return time.format('HH:mm');
     },
   },
 };

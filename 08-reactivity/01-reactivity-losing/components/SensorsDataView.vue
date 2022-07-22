@@ -1,6 +1,7 @@
 <template>
   <div v-if="!sensors">Loading...</div>
   <template v-else>
+    {{ $data }}
     <sensors-data-row v-for="sensor in sensors" :key="sensor.id" :sensor="sensor" />
   </template>
 </template>
@@ -19,8 +20,15 @@ export default {
 
   data() {
     return {
+      rowIndex: 0,
       sensors: null,
     };
+  },
+
+  computed: {
+    forceRerender() {
+      return (rowIndex += 1);
+    },
   },
 
   mounted() {
