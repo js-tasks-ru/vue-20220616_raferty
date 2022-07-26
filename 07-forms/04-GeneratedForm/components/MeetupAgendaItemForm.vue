@@ -16,13 +16,7 @@
       </div>
       <div class="agenda-item-form__col">
         <ui-form-group label="Окончание">
-          <ui-input
-            v-model="localAgendaItem.endsAt"
-            type="time"
-            placeholder="00:00"
-            name="endsAt"
-            @change="changeEndsTime"
-          />
+          <ui-input v-model="localAgendaItem.endsAt" type="time" placeholder="00:00" name="endsAt" />
         </ui-form-group>
       </div>
     </div>
@@ -211,42 +205,25 @@ export default {
     },
 
     'localAgendaItem.startsAt': {
-      handler(value) {
-        this.localAgendaItem.endsAt = this.getMomentFromTimeString(value);
+      handler(newValue, oldValue) {
+        const delta = this.getMomentFromTimeString(newValue) - this.getMomentFromTimeString(oldValue);
+
+        this.localAgendaItem.endsAt = this.setShiftedTime(delta);
       },
     },
   },
 
   methods: {
-    changeEndsTime(event) {
-      this.localAgendaItem.startsAt = this.decreaseTime(event.target.value);
-    },
+    setShiftedTime(delta) {
+      const time = moment.utc(this.localAgendaItem.endsAt, 'hh:mm');
 
-    decreaseTime(time) {
-      const momentTime = moment.utc(time, 'hh:mm');
-      const momentEndsHours = momentTime.get('hour');
-
-      if (momentEndsHours > 24) {
-        momentTime.add(-1, 'd');
-        time.set('hour', momentEndsHours - 24);
-      } else {
-        momentTime.add(-5, 'h');
-      }
-      return momentTime.format('HH:mm');
+      time.add(delta, 'h');
+      return time.format('HH:mm');
     },
 
     getMomentFromTimeString(str) {
       const time = moment.utc(str, 'hh:mm');
-      const hours = time.get('hour');
-
-      if (hours > 24) {
-        time.add(1, 'd');
-        time.set('hour', hours - 24);
-      } else {
-        time.add(5, 'h');
-      }
-
-      return time.format('HH:mm');
+      return time.get('hour');
     },
   },
 };
