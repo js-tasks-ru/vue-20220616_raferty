@@ -182,7 +182,6 @@ export default {
     return {
       localAgendaItem: klona(this.agendaItem),
       agendaFields: undefined,
-      duration: 5,
     };
   },
 
