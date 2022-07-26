@@ -1,5 +1,5 @@
 <script>
-// import { compile } from 'vue';
+import { compile } from 'vue';
 
 export default {
   name: 'TemplateRenderer',
@@ -20,5 +20,16 @@ export default {
       default: () => [],
     },
   },
+
+  methods: {
+    renderFunction() {
+      return compile(this.template);
+    },
+  },
+
+  render(...args) {
+    return this.renderFunction.apply(this, args);
+  },
+
 };
 </script>
