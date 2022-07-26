@@ -1,6 +1,7 @@
 <template>
   <div v-if="!sensors">Loading...</div>
   <template v-else>
+    {{ $data }}
     <sensors-data-row v-for="sensor in sensors" :key="sensor.id" :sensor="sensor" />
   </template>
 </template>
@@ -9,6 +10,8 @@
 import { SensorsDataController } from '../services/SensorsDataController';
 import { SensorsDataStreamingService } from '../services/SensorsDataStreamingService';
 import SensorsDataRow from './SensorsDataRow';
+
+import { klona } from 'klona';
 
 export default {
   name: 'SensorsDataView',
@@ -42,7 +45,7 @@ export default {
     },
 
     setData(sensors) {
-      this.sensors = sensors;
+      this.sensors = klona(sensors);
     },
   },
 };
